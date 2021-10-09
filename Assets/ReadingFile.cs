@@ -21,18 +21,43 @@ public class ReadingFile : MonoBehaviour
         foreach (var symbol in AllSymbol)
         {
             var parse = symbol.Split(char.Parse(";"));
-            if(parse.Length == 1)
+            if(parse[0].Length == 1)
             {
-                tempNewAllSymbol.Add(parse[0] + ";" + 0);
-                newAllSymbol.Add(parse[0]);
-            }
-            else
-            {
-                tempNewAllSymbol.Add(parse[0] + ";" + parse[1]);
-                int correctAnswers = int.Parse(parse[1]);
-                if(correctAnswers < 10)
+                if(parse.Length == 1)
                 {
-                    newAllSymbol.Add(parse[0]);
+                    bool match = false;
+                    foreach (var symbol2 in newAllSymbol)
+                    {
+                        if(parse[0] == symbol2)
+                        {
+                            match = true;
+                        }
+                    }
+                    if(match == false)
+                    {
+                        newAllSymbol.Add(parse[0]);
+                        tempNewAllSymbol.Add(parse[0] + ";" + 0);
+                    }
+                }
+                else
+                {
+                    int correctAnswers = int.Parse(parse[1]);
+                    if(correctAnswers < 10)
+                    {
+                        bool match = false;
+                        foreach (var symbol2 in newAllSymbol)
+                        {
+                            if(parse[0] == symbol2)
+                            {
+                                match = true;
+                            }
+                        }
+                        if(match == false)
+                        {
+                            newAllSymbol.Add(parse[0]);
+                            tempNewAllSymbol.Add(parse[0] + ";" + parse[1]);
+                        }
+                    }
                 }
             }
         }
@@ -77,29 +102,37 @@ public class ReadingFile : MonoBehaviour
     }
     void RandomSymbol()
     {
-        currentText = "";
-        int random = Random.Range(0, newAllSymbol.Count);
-        currentText += newAllSymbol[random];
-        int numberSymbol = newAllSymbol[random].Length;
-        while(numberSymbol < 18)
+        if(newAllSymbol.Count > 0)
         {
-            random = Random.Range(0, newAllSymbol.Count);
+            currentText = "";
+            int random = Random.Range(0, newAllSymbol.Count);
             currentText += newAllSymbol[random];
-            numberSymbol ++;
+            int numberSymbol = newAllSymbol[random].Length;
+            while(numberSymbol < 18)
+            {
+                random = Random.Range(0, newAllSymbol.Count);
+                currentText += newAllSymbol[random];
+                numberSymbol ++;
+            }
+            currentTextBox.text = currentText;
+            writtenTextBox.text = "";
         }
-        currentTextBox.text = currentText;
-        writtenTextBox.text = "";
+        else
+        {
+            OpenStatistics();
+        }
     }
     void CreateNewFile(string correctsymbol, bool СorrectAnswer)
     {
+        newAllSymbol.Clear();
         List<string> tempNewAllSymbol = new List<string>();
         AllSymbol = File.ReadAllLines("AllSymbol.txt");
         foreach (var symbol in AllSymbol)
         {
             var parse = symbol.Split(char.Parse(";"));
+            int correctAnswers = int.Parse(parse[1]);
             if(parse[0] == correctsymbol)
             {
-                int correctAnswers = int.Parse(parse[1]);
                 if(СorrectAnswer)
                 {
                     correctAnswers++;
@@ -113,6 +146,10 @@ public class ReadingFile : MonoBehaviour
             else
             {
                 tempNewAllSymbol.Add(symbol);
+            }
+            if(correctAnswers < 10)
+            {
+                newAllSymbol.Add(parse[0]);
             }
         }
         File.WriteAllLines("AllSymbol.txt", tempNewAllSymbol);
@@ -130,7 +167,7 @@ public class ReadingFile : MonoBehaviour
             {
                 statisticsTextBox.text += $"<color=#FF0000>{ parse[0] }</color><color=#FF0000>({ parse[1] })</color>  ";
             }
-            else if (correctAnswers > 10)
+            else if (correctAnswers >= 10)
             {
                 statisticsTextBox.text += $"<color=#00FF00>{ parse[0] }</color><color=#00FF00>({ parse[1] })</color>  ";
             }
