@@ -13,50 +13,41 @@ public class ReadingFile : MonoBehaviour
     List<string> newAllSymbol;
     public GameObject statistics;
     public Text statisticsTextBox;
+    string[] parse;
+    List<string> tempNewAllSymbol;
     void Start()
     {
-        List<string> tempNewAllSymbol = new List<string>();
+        tempNewAllSymbol = new List<string>();
         newAllSymbol = new List<string>();
         AllSymbol = File.ReadAllLines("AllSymbol.txt");
         foreach (var symbol in AllSymbol)
         {
-            var parse = symbol.Split(char.Parse(";"));
-            if(parse[0].Length == 1)
+            parse = symbol.Split(char.Parse(";"));
+            if (parse[0].Length == 1)
             {
-                if(parse.Length == 1)
+                bool match = false;
+                foreach (var symbol2 in newAllSymbol)
                 {
-                    bool match = false;
-                    foreach (var symbol2 in newAllSymbol)
+                    if (parse[0] == symbol2)
                     {
-                        if(parse[0] == symbol2)
-                        {
-                            match = true;
-                        }
+                        match = true;
                     }
-                    if(match == false)
+                }
+                if (match == false)
+                {
+                    if (parse.Length == 1)
                     {
                         newAllSymbol.Add(parse[0]);
                         tempNewAllSymbol.Add(parse[0] + ";" + 0);
                     }
-                }
-                else
-                {
-                    int correctAnswers = int.Parse(parse[1]);
-                    if(correctAnswers < 10)
+                    else
                     {
-                        bool match = false;
-                        foreach (var symbol2 in newAllSymbol)
-                        {
-                            if(parse[0] == symbol2)
-                            {
-                                match = true;
-                            }
-                        }
-                        if(match == false)
+                        int correctAnswers = int.Parse(parse[1]);
+                        if (correctAnswers < 10)
                         {
                             newAllSymbol.Add(parse[0]);
-                            tempNewAllSymbol.Add(parse[0] + ";" + parse[1]);
                         }
+                        tempNewAllSymbol.Add(parse[0] + ";" + parse[1]);
                     }
                 }
             }
@@ -66,14 +57,14 @@ public class ReadingFile : MonoBehaviour
     }
     void Update()
     {
-        if(Input.anyKeyDown)
+        if (Input.anyKeyDown)
         {
             string currentSymbol = Input.inputString;
             if (currentSymbol.Length > 0)
             {
                 if ((int)currentText[number] == (int)currentSymbol[0])
                 {
-                    if(error == true)
+                    if (error == true)
                     {
                         writtenTextBox.text = writtenTextBox.text.Remove(writtenTextBox.text.Length - 24);
                         error = false;
@@ -81,7 +72,7 @@ public class ReadingFile : MonoBehaviour
                     writtenTextBox.text += $"<color=#00FF00>{ Input.inputString }</color>";
                     CreateNewFile(currentText[number].ToString(), true);
                     number++;
-                    if(number >= currentText.Length)
+                    if (number >= currentText.Length)
                     {
                         number = 0;
                         RandomSymbol();
@@ -102,17 +93,16 @@ public class ReadingFile : MonoBehaviour
     }
     void RandomSymbol()
     {
-        if(newAllSymbol.Count > 0)
+        if (newAllSymbol.Count > 0)
         {
             currentText = "";
-            int random = Random.Range(0, newAllSymbol.Count);
-            currentText += newAllSymbol[random];
-            int numberSymbol = newAllSymbol[random].Length;
-            while(numberSymbol < 18)
+            int random;
+            int numberSymbol = 0;
+            while (numberSymbol < 18)
             {
                 random = Random.Range(0, newAllSymbol.Count);
                 currentText += newAllSymbol[random];
-                numberSymbol ++;
+                numberSymbol++;
             }
             currentTextBox.text = currentText;
             writtenTextBox.text = "";
@@ -131,9 +121,9 @@ public class ReadingFile : MonoBehaviour
         {
             var parse = symbol.Split(char.Parse(";"));
             int correctAnswers = int.Parse(parse[1]);
-            if(parse[0] == correctsymbol)
+            if (parse[0] == correctsymbol)
             {
-                if(СorrectAnswer)
+                if (СorrectAnswer)
                 {
                     correctAnswers++;
                 }
@@ -147,7 +137,7 @@ public class ReadingFile : MonoBehaviour
             {
                 tempNewAllSymbol.Add(symbol);
             }
-            if(correctAnswers < 10)
+            if (correctAnswers < 10)
             {
                 newAllSymbol.Add(parse[0]);
             }
@@ -163,7 +153,7 @@ public class ReadingFile : MonoBehaviour
         {
             var parse = symbol.Split(char.Parse(";"));
             int correctAnswers = int.Parse(parse[1]);
-            if(correctAnswers < 0)
+            if (correctAnswers < 0)
             {
                 statisticsTextBox.text += $"<color=#FF0000>{ parse[0] }</color><color=#FF0000>({ parse[1] })</color>  ";
             }
